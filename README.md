@@ -47,3 +47,4 @@ console.log(resource.get('title'));
 
 console.log(resource.link('self'));
 // { href: '/lorem' }
+```
