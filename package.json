@@ -1,0 +1,26 @@
+{
+  "name": "halson",
+  "version": "1.0.0",
+  "description": "Fault-tolerant HAL+JSON parser and writer",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter spec --bail test.js"
+  },
+  "keywords": [
+    "HAL",
+    "JSON",
+    "REST",
+    "Hypermedia",
+    "HATEOAS",
+    "API"
+  ],
+  "author": "Seznam.cz, a.s.",
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "~1.18.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seznam/halson"
+  }
+}
