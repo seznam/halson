@@ -1,6 +1,6 @@
 {
   "name": "halson",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Fault-tolerant HAL+JSON parser and writer",
   "main": "index.js",
   "scripts": {
