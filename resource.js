@@ -1,20 +1,19 @@
 
 function Resource(data, self) {
-    this.data = (typeof data === "undefined") ? {} : data;
+    this.data = data || {};
     this.links = {};
     this.embedded = {};
-    if (typeof self !== "undefined") {
+    if (self) {
         this.link("self", self);
     }
     return this;
 };
 
 Resource.prototype._append = function(list, key, value) {
-    var stack = list[key];
-    if (typeof stack === "undefined") {
-        list[key] = [value];
+    if (key in list) {
+        list[key].push(value);
     } else {
-        stack.push(value);
+        list[key] = [value];
     }
 };
 
@@ -36,7 +35,7 @@ Resource.prototype._expand = function(key, stack) {
 };
 
 Resource.prototype.link = function(rel, link) {
-    if (typeof link === "string") {
+    if (typeof link == "string") {
         link = {href: link};
     }
 
@@ -54,7 +53,7 @@ Resource.prototype.link = function(rel, link) {
             link.templated = true;
         }
 
-        if (-1 === link.href.search('{rel}')) {
+        if (link.href.indexOf('{rel}') == -1) {
             throw new Error('Curie must contain {rel} placeholder');
         }
     }

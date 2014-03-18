@@ -10,8 +10,7 @@ ParsedResource.prototype._parse = function(list) {
     var ret = {};
 
     for (var rel in data) {
-        var items = data[rel];
-        items = (items instanceof Array) ? items : [items];
+        var items = [].concat(data[rel]);
         if (list == "_embedded") {
             items = items.map(function(item) {
                 return new ParsedResource(item);
@@ -29,7 +28,7 @@ ParsedResource.prototype.get = function(key) {
 
 ParsedResource.prototype.self = function(attribute) {
     var self = this.link('self') || {};
-    if (typeof attribute === "undefined") {
+    if (!attribute) {
         return self;
     }
     return self[attribute];
@@ -75,7 +74,7 @@ ParsedResource.prototype.embedByURI = function(rel, uri) {
 };
 
 function parse(data) {
-    if (typeof data === "string") {
+    if (typeof data == "string") {
         data = JSON.parse(data);
     }
 
