@@ -5,6 +5,8 @@ function ParsedResource(data) {
     this._embedded = this._parse("_embedded");
 };
 
+ParsedResource.prototype.className = "HALSONParsedResource";
+
 ParsedResource.prototype._parse = function(list) {
     var data = this.data[list] || {};
     var ret = {};
@@ -81,4 +83,5 @@ function parse(data) {
     return new ParsedResource(data);
 };
 
-module.exports = parse;
+exports.parse = parse;
+exports.ParsedResource = ParsedResource;

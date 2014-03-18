@@ -3,6 +3,12 @@ var hal = require('./index');
 
 describe('Resource', function() {
     describe('constructor', function(){
+        it('should have a className', function() {
+            var res = new hal.Resource();
+            assert.ok(res.className);
+            assert.equal(res.className, hal.Resource.prototype.className);
+        });
+
         it('should construct an empty Resource', function() {
             var res = new hal.Resource();
             assert.deepEqual(res.toObject(), {});
@@ -282,6 +288,14 @@ describe('parse', function() {
                 headline: "R 2"
             }]
         }
+    });
+
+    describe('ParsedResource', function() {
+        it('should have a className', function() {
+            var res = new hal.parse(data);
+            assert.ok(res.className);
+            assert.equal(res.className, hal.ParsedResource.prototype.className);
+        });
     });
 
     describe('_links', function(){
