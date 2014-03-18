@@ -9,6 +9,8 @@ function Resource(data, self) {
     return this;
 };
 
+Resource.prototype.className = "HALSONResource";
+
 Resource.prototype._append = function(list, key, value) {
     if (key in list) {
         list[key].push(value);
