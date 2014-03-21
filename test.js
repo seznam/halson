@@ -1,358 +1,504 @@
 var assert = require('assert');
-var hal = require('./index');
+var expect = require('chai').expect;
+var halson = require('./index');
 
-describe('Resource', function() {
-    describe('constructor', function(){
-        it('should have a className', function() {
-            var res = new hal.Resource();
-            assert.ok(res.className);
-            assert.equal(res.className, hal.Resource.prototype.className);
-        });
-
-        it('should construct an empty Resource', function() {
-            var res = new hal.Resource();
-            assert.deepEqual(res.toObject(), {});
-        });
-
-        it('should use provided data', function() {
-            var data = {a: 1, b: 2};
-            var res = new hal.Resource(data);
-            assert.deepEqual(res.toObject(), data);
-        });
-
-        it('should link a self-relation (plain)', function() {
-            var data = {a: 1, b: 2};
-            var res = new hal.Resource(data, '/me');
-            data._links = {
-                self: {href: '/me'}
-            }
-            assert.deepEqual(res.toObject(), data);
-        });
-
-        it('should link a self–relation (object)', function() {
-            var data = {a: 1, b: 2};
-            var self = {href: '/me', profile: 'x:prof', name: 'lorem-ipsum'};
-            var res = new hal.Resource(data, self);
-            data._links = {
-                self: self
-            }
-            assert.deepEqual(res.toObject(), data);
-        });
-    });
-
-    describe('links', function() {
-        it('should set a link (plain)', function() {
-            var res = new hal.Resource();
-            res.link('self', '/me');
-            assert.deepEqual(res.toObject(), {
-                _links: {
-                    self: {href: '/me'}
-                }
-            });
-        });
-
-        it('should set a link (object)', function() {
-            var res = new hal.Resource();
-            res.link('self', {href:'/me', profile:'/profile'});
-            assert.deepEqual(res.toObject(), {
-                _links: {
-                    self: {href:'/me', profile:'/profile'}
-                }
-            });
-        });
-
-        it('should set multiple links', function() {
-            var res = new hal.Resource();
-            res.link('next', '/next-resource');
-            res.link('related', '/related-resources/1');
-            res.link('related', {
-                href: '/related-resources/2',
-                title: 'Second Related Resource'
-            });
-            assert.deepEqual(res.toObject(), {
-                _links: {
-                    next: {
-                        href: '/next-resource'
-                    },
-                    related: [
-                        {href:'/related-resources/1'},
-                        {
-                            href: '/related-resources/2',
-                            title: 'Second Related Resource'
-                        }
-                    ]
-                }
-            });
-        });
-    });
-
-    describe('curies', function() {
-        it('should create a curie', function(){
-            var res = new hal.Resource();
-            res.curie('ex', '/rels/{rel}');
-            assert.deepEqual(res.toObject(), {
-                _links: {
-                    curies: [{
-                        name: 'ex',
-                        href: '/rels/{rel}',
-                        templated: true
-                    }]
-                }
-            });
-
-            var res = new hal.Resource();
-            res.link('curies', {href: '/rels/{rel}', name: 'ex'});
-            assert.deepEqual(res.toObject(), {
-                _links: {
-                    curies: [{
-                        name: 'ex',
-                        href: '/rels/{rel}',
-                        templated: true
-                    }]
-                }
-            });
-        });
-
-        it('should reject an invalid curie', function() {
-            var res = new hal.Resource();
-            assert.throws(function() {
-                    res.link('curies', '/invalid/curie');
-                }, Error
-            );
-
-            var res = new hal.Resource();
-            assert.throws(function() {
-                    res.link('curies', {href: '/invalid/curie', name: 'ex', templated: true});
-                }, Error
-            );
-
-            var res = new hal.Resource();
-            assert.throws(function() {
-                    res.link('curies', {href: '/invalid/curie/{rel}', templated: true});
-                }, Error
-            );
-        });
-    });
-
-    describe('embedded', function() {
-        it('should embed a nested resource', function() {
-            var nested = new hal.Resource({name: "Acme co."}, '/company/acme');
-            var res = new hal.Resource({name: "Harry"}, '/harry');
-            res.embed("up", nested);
-            assert.deepEqual(res.toObject(), {
-                _links: {
-                    self: {href:'/harry'}
-                },
-                name: "Harry",
-                _embedded: {
-                    up: {
-                        _links: {
-                            self: {href: '/company/acme'}
-                        },
-                        name: "Acme co."
-                    }
-                }
-            });
-
-        });
-
-        it('should embed a nested resources', function() {
-            var nested1 = new hal.Resource({name: "Acme co."}, '/company/acme');
-            var nested2 = new hal.Resource({name: "Acme2 co."}, '/company/acme2');
-            var res = new hal.Resource({name: "Harry"}, '/harry');
-            res.embed("up", nested1);
-            res.embed("up", nested2);
-            assert.deepEqual(res.toObject(), {
-                _links: {
-                    self: {href:'/harry'}
-                },
-                name: "Harry",
-                _embedded: {
-                    up: [{
-                        _links: {
-                            self: {href: '/company/acme'}
-                        },
-                        name: "Acme co."
-                    },
-                    {
-                        _links: {
-                            self: {href: '/company/acme2'}
-                        },
-                        name: "Acme2 co."
-                    }]
-                }
-            });
-        });
-
-        it('should embed a nested object', function() {
-            var nested = new hal.Resource({name: "Acme co."}, '/company/acme');
-            var nested = nested.toObject();
-            var res = new hal.Resource({name: "Harry"}, '/harry');
-            res.embed("up", nested);
-            assert.deepEqual(res.toObject(), {
-                _links: {
-                    self: {href:'/harry'}
-                },
-                name: "Harry",
-                _embedded: {
-                    up: {
-                        _links: {
-                            self: {href: '/company/acme'}
-                        },
-                        name: "Acme co."
-                    }
-                }
-            });
-        });
-    });
-
-    describe('properties', function() {
-        it('should set a property', function() {
-            var res = new hal.Resource();
-            res.set('name', 'Harry');
-            res.set('job', 'CEO');
-            var address = {
-                street: '1 Infinite Loop',
-                city: 'Cupertino',
-                state: 'CA',
-                code: 95014
-            }
-            res.set('address', address);
-            assert.deepEqual(res.toObject(), {
-                name: 'Harry',
-                job: 'CEO',
-                address: address
-            });
-        });
-
-        it('should reject _links', function() {
-            var res = new hal.Resource();
-            assert.throws(function() {
-                    res.set('_links', {});
-                }, Error
-            );
-        });
-
-        it('should reject _embedded', function() {
-            var res = new hal.Resource();
-            assert.throws(function() {
-                    res.set('_embedded', {});
-                }, Error
-            );
-        });
-    });
-
-    describe('export', function() {
-        it('should export as Object', function() {
-            var res = new hal.Resource({a: 1, b: 2});
-            assert.deepEqual(res.toObject(), {a: 1, b: 2});
-        });
-
-        it('should export as JSON', function() {
-            var res = new hal.Resource({a: 1, b: 2});
-            assert.equal(res.toJSON(), '{"a":1,"b":2}');
-        });
-    });
-});
-
-describe('parse', function() {
-    var self = {"href": "/harry", "profile": "/profile"};
-    var rel1 = {"href": "/related/1", "name": "r1"};
-    var rel2 = {"href": "/related/2", "name": "r2"};
-    var curie = {name: 'ex', templated: true, href: "/rels/{rel}"};
-    var data = JSON.stringify({
-        _links: {
-            self: self,
-            related: [rel1, rel2],
-            curies: [curie]
+var example = {
+    _links: {
+        self: {
+            href: "/hajovsky",
         },
-        name: "Harry",
-        job: "CEO",
-        _embedded: {
-            "next": {
+        avatar: {
+            href: "https://avatars0.githubusercontent.com/u/113901?s=460",
+            type: "image/jpeg"
+        },
+        related: [{
+            href: "http://hajovsky.sk",
+            name: "homepage"
+        }, {
+            href: "https://twitter.com/hajovsky",
+            name: "twitter"
+        }]
+    },
+    title: "Juraj Hájovský",
+    username: "hajovsky",
+    emails: [
+        "juraj.hajovsky@example.com",
+        "hajovsky@example.com"
+    ],
+    stats: {
+        starred: 3,
+        followers: 0,
+        following: 0
+
+    },
+    joined: "2009-08-10T00:00:00.000Z",
+    _embedded: {
+        starred: [
+            {
                 _links: {
-                    self: {href: "/bobby"}
+                    self: {
+                        href: '/joyent/node'
+                    },
+                    related: {
+                        href: 'http://nodejs.org/',
+                        title: 'nodejs.org',
+                        name: 'website'
+                    },
+                    author: {
+                        href: '/joyent',
+                        title: 'Joyent'
+                    }
                 },
-                name: "Bobby",
-                job: "Developer"
+                title: "joyent / node",
+                description: "evented I/O for v8 javascript",
+                stats: {
+                    watched: 2092,
+                    starred: 28426,
+                    forked: 5962
+                }
             },
-            "related": [{
+            {
                 _links: {
-                    self: rel1
+                    self: {
+                        href: '/koajs/koa'
+                    },
+                    related: {
+                        href: 'http://koajs.com',
+                        title: 'koajs.com',
+                        name: 'website'
+                    },
+                    author: {
+                        href: '/koajs',
+                        title: 'koajs'
+                    }
                 },
-                headline: "R 1"
-            }, {
+                title: "koajs / koa",
+                description: "Expressive middleware for node.js using generators",
+                stats: {
+                    watched: 238,
+                    starred: 3193,
+                    forked: 180
+                }
+            },
+            {
                 _links: {
-                    self: rel2
+                    self: {
+                        href: '/pgte/nock'
+                    },
+                    author: {
+                        href: '/pgte',
+                        title: 'Pedro Teixeira'
+                    }
                 },
-                headline: "R 2"
-            }]
-        }
-    });
+                title: "pgte / nock",
+                description: "HTTP mocking and expectations library",
+                stats: {
+                    watched: 22,
+                    starred: 803,
+                    forked: 77
+                }
+            }
+        ]
+    }
+}
 
-    describe('ParsedResource', function() {
-        it('should have a className', function() {
-            var res = new hal.parse(data);
-            assert.ok(res.className);
-            assert.equal(res.className, hal.ParsedResource.prototype.className);
+function clone(data) {
+    return JSON.parse(JSON.stringify(data));
+}
+
+function dump(obj) {
+    console.log(JSON.stringify(obj, null, '  '));
+}
+
+describe('halson', function() {
+    describe('factory', function() {
+        it('create without data', function() {
+            var res = halson();
+            var expected = {};
+            expect(res.className).to.be.a("string");
+            expect(res.className).to.be.equal(halson.Resource.prototype.className);
+            assert.deepEqual(res, expected);
+        });
+
+        it('create with object', function() {
+            var res = halson(clone(example));
+            var expected = clone(example);
+            assert.deepEqual(res, expected);
+        });
+
+        it("ignore prototype of data", function() {
+            function x() {
+                this.dolor = 'sit';
+            };
+            x.prototype.lorem = 'ipsum';
+            var data = new x();
+            var res = halson(data);
+            expect(res.lorem).to.be.undefined;
+            expect(res.dolor).to.be.equal('sit');
+        });
+
+        it('create with serialized object', function() {
+            var res = halson(JSON.stringify(clone(example)));
+            var expected = clone(example);
+            assert.deepEqual(res, expected);
+        });
+
+        it('prevent double conversion', function() {
+            var data = {title:'Untitled'};
+            var res1 = halson(data);
+            var res2 = halson(res1);
+            expect(res1).to.be.equal(res2);
         });
     });
 
-    describe('_links', function(){
-        it('link()', function(){
-            var res = hal.parse(data);
-            assert.deepEqual(res.link("self"), self);
-            assert.deepEqual(res.link("related"), rel1);
+    describe('_compact', function() {
+        it('ignore array with many elements', function(){
+            var res = halson(clone(example));
+            var expected = clone(example._embedded);
+            expect(res._embedded.starred).to.be.length(3);
+            res._compact('_embedded');
+            expect(res._embedded.starred).to.be.length(3);
+            assert.deepEqual(res._embedded, expected);
         });
 
-        it('links()', function(){
-            var res = hal.parse(data);
-            assert.deepEqual(res.links("related"), [rel1, rel2]);
-            assert.deepEqual(res.links("not-related"), []);
+        it('flatify array with one element', function(){
+            var res = halson(clone(example));
+            var tmp = clone(example._embedded).starred[0];
+            res._embedded.starred = [tmp];
+            expect(res._embedded.starred).to.be.length(1);
+            res._compact('_embedded');
+            assert.deepEqual(res._embedded.starred, tmp);
         });
 
-        it('linkByName()', function(){
-            var res = hal.parse(data);
-            assert.deepEqual(res.linkByName("related", "r2"), rel2);
-        });
-    });
-
-    describe('_embedded', function(){
-        it('embed()', function(){
-            var res = hal.parse(data);
-            var next = res.embed("next");
-            assert.deepEqual(next.link("self").href, "/bobby");
-        });
-
-        it('embeds()', function(){
-            var res = hal.parse(data);
-            var next = res.embeds("next")[0];
-            assert.deepEqual(next.link("self").href, "/bobby");
-        });
-
-        it('embedByURI', function(){
-            var res = hal.parse(data);
-            var embed = res.embedByURI('related', '/related/1');
-            assert.equal(embed.link('self').href, '/related/1');
+        it('purge array with no elements', function(){
+            var res = halson();
+            res._embedded = {};
+            res._compact('_embedded');
+            expect(res._embedded).to.be.undefined;
         });
     });
 
-    describe('properties', function(){
-        it('should get a property', function() {
-            var res = hal.parse(data);
-            assert.equal(res.get('name'), 'Harry');
-            assert.equal(res.get('job'), 'CEO');
+    describe('listLinkRels()', function() {
+        it('return empty list', function() {
+            var res = halson().listLinkRels();
+            var expected = [];
+            assert.deepEqual(res, expected);
         });
 
-        it('should get a self-relation', function() {
-            var res = hal.parse(data);
-            assert.deepEqual(res.self(), self);
+        it('return existing rels', function() {
+            var res = halson(clone(example)).listLinkRels();
+            var expected = ['self', 'avatar', 'related'];
+            assert.deepEqual(res, expected);
+        });
+    });
+
+    describe('listEmbedRels()', function() {
+        it('return empty list', function() {
+            var res = halson().listEmbedRels();
+            var expected = [];
+            assert.deepEqual(res, expected);
         });
 
-        it('should get a self-relation attribute', function() {
-            var res = hal.parse(data);
-            assert.equal(res.self('href'), '/harry');
-            assert.equal(res.self('profile'), '/profile');
+        it('return existing rels', function() {
+            var res = halson(clone(example)).listEmbedRels();
+            var expected = ['starred'];
+            assert.deepEqual(res, expected);
+        });
+    });
+
+    describe('getLinks()', function() {
+        it('return empty list', function() {
+            var expected = [];
+
+            var res = halson().getLinks('self');
+            assert.deepEqual(res, expected);
+
+            res = halson(clone(example)).getLinks('selfX');
+            assert.deepEqual(res, expected);
+        });
+
+        it('return links by rel', function() {
+            var res = halson(clone(example)).getLinks('avatar');
+            assert.deepEqual(res, [example._links.avatar]);
+
+            res = halson(clone(example)).getLinks('related');
+            assert.deepEqual(res, example._links.related);
+        });
+
+        it('use filterCallback', function() {
+            var expected = [{
+                href: "https://twitter.com/hajovsky",
+                name: "twitter"
+            }];
+
+            var res = halson(clone(example))
+            var links = res.getLinks('related', function(item) {
+                return item.name === "twitter";
+            });
+            assert.deepEqual(links, expected);
+
+            links = res.getLinks('related', function(item) {
+                return Boolean(item.href);
+            });
+            assert.deepEqual(links, example._links.related);
+        });
+
+        it('use begin/end', function() {
+            var res = halson(clone(example));
+            var links = res.getLinks('related', null, 0);
+            assert.deepEqual(links, example._links.related);
+
+            var links = res.getLinks('related', null, 1);
+            assert.deepEqual(links, example._links.related.slice(1));
+
+            var links = res.getLinks('related', null, 0, 1);
+            assert.deepEqual(links, example._links.related.slice(0, 1));
+        });
+    });
+
+    describe('getLink()', function() {
+        it('return undefined', function() {
+            var res = halson().getLink('selfX');
+            expect(res).to.be.undefined;
+
+            res = halson(clone(example)).getLink('selfX');
+            expect(res).to.be.undefined;
+        });
+
+        it('return link by rel', function() {
+            var res = halson(clone(example));
+
+            assert.deepEqual(res.getLink('avatar'), example._links.avatar);
+            assert.deepEqual(res.getLink('related'), example._links.related[0]);
+        });
+
+        it('use filterCallback', function() {
+            var res = halson(clone(example));
+
+            assert.deepEqual(res.getLink('avatar', function(item) {
+                return true;
+            }), example._links.avatar);
+
+            assert.deepEqual(res.getLink('related', function(item) {
+                return item.name === "twitter";
+            }), example._links.related[1]);
+
+            assert.deepEqual(res.getLink('related', function(item) {
+                return true;
+            }), example._links.related[0]);
+        });
+    });
+
+    describe('getEmbeds()', function() {
+        it('return empty list', function() {
+            var res = halson();
+            assert.deepEqual(res.getEmbeds('asdf'), []);
+
+            res = halson(clone(example));
+            assert.deepEqual(res.getEmbeds('asdf'), []);
+        });
+
+        it('return embedded as HALSON Resources', function() {
+            var res = halson(clone(example));
+            var expected = example._embedded.starred.map(function(item) {
+                return halson(item);
+            });
+
+            var ret = res.getEmbeds('starred');
+            assert.deepEqual(ret, expected);
+            expect(ret[0].className).to.be.equal(halson.Resource.prototype.className);
+        });
+
+        it('user filterCallback', function() {
+            var res = halson(clone(example));
+            var expected = [halson(example._embedded.starred[1])];
+            var embeds = res.getEmbeds('starred', function(item) {
+                return item._links.self.href === '/koajs/koa';
+            });
+            assert.deepEqual(embeds, expected);
+
+            expected = example._embedded.starred.map(function(item) {
+                return halson(item);
+            });
+            embeds = res.getEmbeds('starred', function(item) {
+                return true;
+            });
+            assert.deepEqual(embeds, expected);
+
+            embeds = res.getEmbeds('starred', function(item) {
+                return false;
+            });
+            assert.deepEqual(embeds, []);
+        });
+
+        it('use begin/end', function() {
+            var res = halson(clone(example));
+            expected = example._embedded.starred.map(function(item) {
+                return halson(item);
+            });
+
+            var embeds = res.getEmbeds('starred', null, 0);
+            assert.deepEqual(embeds, expected);
+
+            var embeds = res.getEmbeds('starred', null, 1);
+            assert.deepEqual(embeds, expected.slice(1));
+
+            var embeds = res.getEmbeds('starred', null, 0, 1);
+            assert.deepEqual(embeds, expected.slice(0, 1));
+        });
+    });
+
+    describe('getEmbed()', function() {
+        it('return undefined', function() {
+            var res = halson();
+            assert.strictEqual(res.getEmbed('item'), undefined);
+        });
+
+        it('return embed by rel', function() {
+            var res = halson(clone(example));
+            var expected = halson(example._embedded.starred[0]);
+            assert.deepEqual(res.getEmbed('starred'), expected);
+        });
+
+        it('use filterCallback', function() {
+            var res = halson(clone(example));
+            var expected = halson(example._embedded.starred[1]);
+            assert.deepEqual(res.getEmbed('starred', function(item) {
+                return item.title == "koajs / koa";
+            }), expected);
+        });
+    });
+
+    describe('addLink()', function() {
+        it('return this', function() {
+            var res = halson();
+            ret = res.addLink('self', '/hajovsky');
+            expect(ret).to.be.equal(res);
+        });
+
+        it('add first link (Object)', function() {
+            var res = halson();
+            var link = {
+                href: '/hajovsky'
+            };
+
+            res.addLink('self', link);
+            assert.deepEqual(res.getLink('self'), link);
+        });
+
+        it('add first link (string)', function() {
+            var res = halson();
+            var link = {
+                href: '/hajovsky'
+            };
+
+            res.addLink('self', link.href);
+            assert.deepEqual(res.getLink('self'), link);
+        });
+
+        it('add second link', function() {
+            var res = halson()
+                .addLink('related', example._links.related[0])
+                .addLink('related', example._links.related[1]);
+
+            assert.deepEqual(res.getLinks('related'), example._links.related);
+        });
+    });
+
+    describe('addEmbed()', function() {
+        it('return this', function(){
+            var res = halson();
+            expect(res).to.be.equal(res.addEmbed('starred', {title: 'Untitled'}));
+        });
+
+        it('add first embed', function() {
+            var res = halson();
+            var embed = {title: "Untitled"};
+            var expected = {
+                _embedded: {
+                    item: {
+                        title: "Untitled"
+                    }
+                }
+            };
+
+            res.addEmbed('item', embed);
+            assert.deepEqual(res, expected);
+        });
+
+        it('add second embed', function() {
+            var res = halson();
+            var embed1 = {title: "Untitled1"};
+            var embed2 = {title: "Untitled2"};
+            var expected = {
+                _embedded: {
+                    item: [{
+                        title: "Untitled1"
+                    }, {
+                        title: "Untitled2"
+                    }]
+                }
+            };
+
+            res.addEmbed('item', embed1);
+            res.addEmbed('item', embed2);
+            assert.deepEqual(res, expected);
+        });
+    });
+
+    describe('removeLinks()', function() {
+        it('remove all links by rel', function() {
+            var res = halson(clone(example));
+            var expected = clone(example._links);
+            delete(expected.related);
+            res.removeLinks('related');
+            assert.deepEqual(res._links, expected);
+        });
+
+        it('ignore missing links', function() {
+            var res = halson(clone(example));
+            var expected = clone(example._links);
+            res.removeLinks('relatedX');
+            assert.deepEqual(res._links, expected);
+        });
+
+        it('use filterCallback', function() {
+            var res = halson(clone(example));
+            res.removeLinks('related', function(item) {
+                return item.name === "twitter";
+            });
+            var expected = clone(example._links);
+            expected.related = expected.related[0];
+            assert.deepEqual(res._links, expected);
+        });
+    });
+
+    describe('removeEmbeds()', function() {
+        it('remove all embeds by rel', function() {
+            var res = halson(clone(example));
+            res.removeEmbeds('starred');
+            assert.deepEqual(res._embedded, {});
+            expect(res._embedded.starred).to.be.undefined;
+        });
+
+        it('ignore missing embeds', function() {
+            var expected = clone(example)._embedded;
+            var res = halson(clone(example));
+            res.removeEmbeds('starredX');
+            assert.deepEqual(res._embedded, expected);
+        });
+
+        it('use filterCallback', function() {
+            var res = halson(clone(example));
+            res.removeEmbeds('starred', function(item){
+                return item.title === "koajs / koa";
+            });
+            var embeds = res.getEmbeds('starred');
+
+            var expected = halson(clone(example)).getEmbeds('starred');
+            var expected = [expected[0], expected[2]];
+
+            assert.deepEqual(embeds, expected);
         });
     });
 });

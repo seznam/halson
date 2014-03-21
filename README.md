@@ -1,5 +1,5 @@
 # HALSON
-Fault-tolerant [hal+json](http://stateless.co/hal_specification.html) parser and writer.
+The [HAL+JSON](http://stateless.co/hal_specification.html) Resource Object.
 
 ## Install
 
@@ -9,100 +9,199 @@ Fault-tolerant [hal+json](http://stateless.co/hal_specification.html) parser and
 npm install halson --save
 ```
 
-## Examples
-
-### Writing the HAL
+## Example
 ```js
-var hal = require('halson');
+var halson = require('halson');
 
-var resource = new hal.Resource({name: "Harry"}, '/harry');
+var embed = halson({
+        title: "joyent / node",
+        description: "evented I/O for v8 javascript"
+    })
+    .addLink('self', '/joyent/node')
+    .addLink('author', {
+        href: '/joyent',
+        title: 'Joyent'
+    });
 
-resource.link('next', '/johnnie');
+var resource = halson({
+        title: "Juraj Hájovský",
+        username: "hajovsky",
+        emails: [
+            "juraj.hajovsky@example.com",
+            "hajovsky@example.com"
+        ]
+    })
+    .addLink('self', '/hajovsky')
+    .addEmbed('starred', embed);
 
-resource.link('avatar', {
-    type: 'image/png',
-    href: '/avatars/harry.png'
-});
-
-var company = new hal.Resource({name: "Acme co."}, {
-    href: '/acme',
-    profile: 'http://microformats.org/wiki/microformats2',
-    type: 'text/html'
-});
-
-resource.curie('ex', '/doc/rels/{rel}');
-resource.embed('ex:company', company);
-
-console.log(resource.toJSON('\t'));
+console.log(resource.title);
+console.log(resource.emails[0]);
+console.log(resource.getLink('self'));
+console.log(resource.getEmbed('starred'));
+console.log(JSON.stringify(resource));
 ```
 
-### Reading the HAL
-```js
-var hal = require('halson');
-var data = '{"title":"Lorem Ipsum","_links":{"self":{"href":"/lorem"}}}';
-var resource = hal.parse(data);
-
-console.log(resource.get('title'));
-// Lorem Ipsum
-
-console.log(resource.link('self'));
-// { href: '/lorem' }
-```
 
 ## API
 
-### `Resource(object, selfLink)`
-Creates new resource object.
- * `object` (optional): attributes of resource
- * `selfLink` (optional): self-link as a string or a link object
+### `halson([data])`
+Create a new HAL+JSON Resource Object.
+ * `data` (optional): Initial data as serialized string or Object.
 
-### `Resource#link(rel, link)`
-Adds a link.
-* `rel`: relation name
-* `link`: link (object or string)
+```js
+// empty HAL+JSON Resource Object
+var resource = halson();
 
-### `Resource#curie(name, template)`
-Adds a named CURIE template.
- * `name`: CURIE's name
- * `template`: CURIE's template
+// resource from a serialized data
+var resource = halson('{title:"Lorem Ipsum",_links:{self:{href:"/ipsum"}}');
 
-### `Resource#embed(rel, embed)`
-Adds an embedded resource.
- * `rel`: relation name
- * `embed`: resource to be embedded (object or Resource)
+// resource from an Object
+resource = halson({
+    _links: {
+        self: {
+            href: {"/ipsum"}
+        }
+    },
+    title: "Lorem Ipsum"
+});
 
-### `Resource#set(key, value)`
-Sets resource attribute.
+// resource from another resource (no-op)
+var resourceX = halson(resorce);
+console.log(resorce === resorceX); // true
+```
 
-### `Resource#toObject()`
-Converts resource to a Javascript Object.
 
-### `Resource#toJSON(space)`
-Converts resource to a serialized JSON string.
+### `HALSONResource#listLinkRels()`
+List all link relations.
 
-### `parse(data)`
-Parse data (serialized JSON string or an Object) and returns instance of `ParsedResource`.
+```js
+var data = {
+    _links: {
+        self: {href: '/hajovsky'},
+        related: [
+            {href: 'http://hajovsky.sk'},
+            {href: 'https://twitter.com/hajovsky'}
+        ]
+    }
+}
 
-### `ParsedResource#get(key)`
-Reads resource attribute.
+var resource = halson(data);
+console.log(resource.listLinkRels()); // ['self', 'related']
+```
 
-### `ParsedResource#self(attribute)`
-Reads attribute of self-relation link.
+### `HALSONResource#listEmbedRels()`
+List all link relations.
 
-### `ParsedResource#links(rel)`
-Returns all links with relation `rel`.
+```js
+var data = {
+    _embedded: {
+        starred: {
+            _links: {
+                self: {href: '/joyent/node'}
+            }
+            title: "joyent / node",
+            description: "evented I/O for v8 javascript"
+        }
+    }
+}
 
-### `ParsedResource#link(rel)`
-Returns first link with relation `rel`.
+var resource = halson(data);
+console.log(resource.listEmbedRels()); // ['starred']
+```
 
-### `ParsedResource#linkByName(rel, name)`
-Returns first link with relation `rel` and name `name`.
+### `HALSONResource#getLinks(rel, [filterCallback, [begin, [end]]])`
+Get all links with relation `rel`.
+ * `rel` (required): Relation name.
+ * `filterCallback` (optional): Function used to filter array of links. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.20)
+ * `begin`, `end` (optional): slice filtered links. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.10)
 
-### `ParsedResource#embeds(rel)`
-Returns all embedded resources with relation `rel`.
+```js
+var twitterLinks = resource.getLinks('related', function(item) {
+    return item.name === "twitter";
+});
+```
 
-### `ParsedResource#embed(rel)`
-Returns first embedded resource with relation `rel`.
+### `HALSONResource#getLink(rel, [filterCallback])`
+Get first link with relation `rel`.
+ * `rel` (required): Relation name.
+ * `filterCallback` (optional): Function used to filter array of links. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.20)
 
-### `ParsedResource#embedByURI(rel, uri)`
-Returns embedded resource with relation `rel` and self-link URI `uri`.
+```js
+var firstRelatedLink = resource.getLink('related');
+```
+
+### `HALSONResource#getEmbeds(rel, [filterCallback, [begin, [end]]])`
+Get all embedded resources with relation `rel`.
+ * `rel` (required): Relation name.
+ * `filterCallback` (optional): Function used to filter array of embeds. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.20)
+ * `begin`, `end` (optional): slice filtered links. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.10)
+
+```js
+var embeds = resource.getEmbeds('starred');
+```
+
+### `HALSONResource#getEmbed(rel, [filterCallback])`
+Get first embedded resource with relation `rel`.
+ * `rel` (required): Relation name.
+ * `filterCallback` (optional): Function used to filter array of embeds. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.20)
+
+```js
+var nodeProject = resource.getEmbed('starred', function(embed) {
+    var selfLink = embed.getLink('self') || {};
+    return selfLink.href === '/joyent/node';
+});
+```
+
+### `HALSONResource#addLink(rel, link)`
+Add a link with relation `rel`.
+ * `rel` (required): Relation name.
+ * `link` (required): Link to be added (string or Object).
+
+```js
+resource
+    .addLink('related', 'http://hajovsky.sk')
+    .addLink('related', {
+        href: 'https://twitter.com/hajovsky',
+        name: 'twitter'
+    });
+```
+
+### `HALSONResource#addEmbed(rel, embed)`
+Add a nested resource with relation `rel`.
+ * `rel` (required): Relation name.
+ * `embed` (required): Resource to be embedded (Object or HALSONResource).
+
+```js
+var embed = {
+    _links: {
+        self: {href: '/joyent/node'}
+    },
+    title: "joyent / node"
+}
+resource.addEmbed('starred', embed);
+```
+
+### `HALSONResource#removeLinks(rel, [filterCallback])`
+Remove links with relation `rel`. If `filterCallback` is not defined, all links with relation `rel` will be removed.
+ * `rel` (required): Relation name.
+ * `filterCallback` (optional): Function used to filter array of links. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.20)
+
+```js
+// remove links with relation 'related' and name 'twitter'
+resource.removeLinks('related', function(link) {
+    return link.name === "twitter";
+});
+```
+
+### `HALSONResource#removeEmbeds(rel, [filterCallback])`
+Remove embedded resources with relation `rel`. If `filterCallback` is not defined, all embeds with relation `rel` will be removed.
+ * `rel` (required): Relation name.
+ * `filterCallback` (optional): Function used to filter array of links. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.20)
+
+```js
+// remove embedded resources with relation 'starred' and self-link '/koajs/koa'
+resource.removeLinks('starred', function(embed) {
+    var selfLink = embed.getLink('self') || {};
+    return selfLink.href === '/koajs/koa';
+});
+```
