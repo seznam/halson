@@ -28,7 +28,7 @@
 
         this._compact("_embedded");
         this._compact("_links");
-    };
+    }
 
     HALSONResource.prototype._compact = function(name, key) {
         var target = this[name];
@@ -64,7 +64,7 @@
     HALSONResource.prototype._invert = function(filterCallback) {
         return function() {
             return !filterCallback.apply(null, arguments);
-        }
+        };
     };
 
     HALSONResource.prototype.listLinkRels = function() {
@@ -113,7 +113,7 @@
 
     HALSONResource.prototype.addLink = function(rel, link) {
         if (typeof link == "string") {
-            link = {href: link}
+            link = {href: link};
         }
 
         if (!this._links) {
@@ -125,7 +125,7 @@
             this._links[rel] = link;
         } else {
             // multiple links
-            this._links[rel] = [].concat(this._links[rel])
+            this._links[rel] = [].concat(this._links[rel]);
             this._links[rel].push(link);
         }
 
@@ -144,7 +144,7 @@
             this._embedded[rel] = item;
             // multiple embeds
         } else {
-            this._embedded[rel] = [].concat(this._embedded[rel])
+            this._embedded[rel] = [].concat(this._embedded[rel]);
             this._embedded[rel].push(item);
         }
 
@@ -186,7 +186,7 @@
             return data;
         }
         return new HALSONResource(data);
-    };
+    }
 
     createHALSONResource.Resource = HALSONResource;
 
@@ -194,5 +194,5 @@
         module.exports = createHALSONResource;
     } else if (win) {
         win.halson = createHALSONResource;
-    };
+    }
 })(typeof(module) == "undefined" ? null : module, typeof(window) == "undefined" ? null : window);
