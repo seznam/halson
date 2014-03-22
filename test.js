@@ -100,7 +100,7 @@ var example = {
             }
         ]
     }
-}
+};
 
 function clone(data) {
     return JSON.parse(JSON.stringify(data));
@@ -129,11 +129,11 @@ describe('halson', function() {
         it("ignore prototype of data", function() {
             function x() {
                 this.dolor = 'sit';
-            };
+            }
             x.prototype.lorem = 'ipsum';
             var data = new x();
             var res = halson(data);
-            expect(res.lorem).to.be.undefined;
+            expect(res.lorem).to.be.an("undefined");
             expect(res.dolor).to.be.equal('sit');
         });
 
@@ -174,7 +174,7 @@ describe('halson', function() {
             var res = halson();
             res._embedded = {};
             res._compact('_embedded');
-            expect(res._embedded).to.be.undefined;
+            expect(res._embedded).to.be.an("undefined");
         });
     });
 
@@ -231,7 +231,7 @@ describe('halson', function() {
                 name: "twitter"
             }];
 
-            var res = halson(clone(example))
+            var res = halson(clone(example));
             var links = res.getLinks('related', function(item) {
                 return item.name === "twitter";
             });
@@ -248,10 +248,10 @@ describe('halson', function() {
             var links = res.getLinks('related', null, 0);
             assert.deepEqual(links, example._links.related);
 
-            var links = res.getLinks('related', null, 1);
+            links = res.getLinks('related', null, 1);
             assert.deepEqual(links, example._links.related.slice(1));
 
-            var links = res.getLinks('related', null, 0, 1);
+            links = res.getLinks('related', null, 0, 1);
             assert.deepEqual(links, example._links.related.slice(0, 1));
         });
     });
@@ -259,10 +259,10 @@ describe('halson', function() {
     describe('getLink()', function() {
         it('return undefined', function() {
             var res = halson().getLink('selfX');
-            expect(res).to.be.undefined;
+            expect(res).to.be.an("undefined");
 
             res = halson(clone(example)).getLink('selfX');
-            expect(res).to.be.undefined;
+            expect(res).to.be.an("undefined");
         });
 
         it('return link by rel', function() {
@@ -340,10 +340,10 @@ describe('halson', function() {
             var embeds = res.getEmbeds('starred', null, 0);
             assert.deepEqual(embeds, expected);
 
-            var embeds = res.getEmbeds('starred', null, 1);
+            embeds = res.getEmbeds('starred', null, 1);
             assert.deepEqual(embeds, expected.slice(1));
 
-            var embeds = res.getEmbeds('starred', null, 0, 1);
+            embeds = res.getEmbeds('starred', null, 0, 1);
             assert.deepEqual(embeds, expected.slice(0, 1));
         });
     });
@@ -478,7 +478,7 @@ describe('halson', function() {
             var res = halson(clone(example));
             res.removeEmbeds('starred');
             assert.deepEqual(res._embedded, {});
-            expect(res._embedded.starred).to.be.undefined;
+            expect(res._embedded.starred).to.be.an("undefined");
         });
 
         it('ignore missing embeds', function() {
@@ -496,7 +496,7 @@ describe('halson', function() {
             var embeds = res.getEmbeds('starred');
 
             var expected = halson(clone(example)).getEmbeds('starred');
-            var expected = [expected[0], expected[2]];
+            expected = [expected[0], expected[2]];
 
             assert.deepEqual(embeds, expected);
         });
