@@ -1,0 +1,26 @@
+{
+  "name": "halson",
+  "main": "index.js",
+  "version": "2.0.0",
+  "homepage": "https://github.com/seznam/halson",
+  "authors": [
+    "Juraj Hájovský <juraj@hajovsky.sk>"
+  ],
+  "description": "The HAL+JSON Resource Object",
+  "keywords": [
+    "HAL",
+    "JSON",
+    "REST",
+    "API",
+    "Hypermedia",
+    "HATEOAS"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
