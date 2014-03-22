@@ -14,7 +14,11 @@
     "HATEOAS",
     "API"
   ],
-  "author": "Seznam.cz, a.s.",
+  "author": {
+    "name": "Juraj Hájovský",
+    "email": "juraj@hajovsky.sk",
+    "url": "http://hajovsky.sk"
+  },
   "license": "MIT",
   "devDependencies": {
     "mocha": "~1.18.0",
