@@ -1,4 +1,6 @@
 # HALSON
+[![Build Status](https://travis-ci.org/seznam/halson.svg?branch=master)](https://travis-ci.org/seznam/halson)
+
 The [HAL+JSON](http://stateless.co/hal_specification.html) Resource Object.
 
 ## Install
