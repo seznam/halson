@@ -1,6 +1,8 @@
 var assert = require('assert');
 var expect = require('chai').expect;
 var halson = require('./index');
+var nodePkg = require('./package.json');
+var bowerPkg = require('./bower.json');
 
 var example = {
     _links: {
@@ -111,6 +113,16 @@ function dump(obj) {
 }
 
 describe('halson', function() {
+    describe('metadata', function() {
+        it('bower.json vs. package.json', function() {
+            assert.equal(nodePkg.name, bowerPkg.name);
+            assert.equal(nodePkg.version, bowerPkg.version);
+            assert.equal(nodePkg.description, bowerPkg.description);
+            assert.equal(nodePkg.license, bowerPkg.license);
+            assert.equal(nodePkg.main, bowerPkg.main);
+        });
+    });
+
     describe('factory', function() {
         it('create without data', function() {
             var res = halson();
