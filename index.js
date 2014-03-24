@@ -89,8 +89,12 @@
         return links.slice(begin || 0, end);
     };
 
-    HALSONResource.prototype.getLink = function(rel, filterCallback) {
-        return this.getLinks(rel, filterCallback, 0, 1)[0];
+    HALSONResource.prototype.getLink = function(rel, filterCallback, def) {
+        if (typeof filterCallback != "function") {
+            def = filterCallback;
+            filterCallback = null;
+        }
+        return this.getLinks(rel, filterCallback, 0, 1)[0] || def;
     };
 
     HALSONResource.prototype.getEmbeds = function(rel, filterCallback, begin, end) {
@@ -107,8 +111,12 @@
         return items.slice(begin || 0, end);
     };
 
-    HALSONResource.prototype.getEmbed = function(rel, filterCallback) {
-        return this.getEmbeds(rel, filterCallback, 0, 1)[0];
+    HALSONResource.prototype.getEmbed = function(rel, filterCallback, def) {
+        if (typeof filterCallback != "function") {
+            def = filterCallback;
+            filterCallback = null;
+        }
+        return this.getEmbeds(rel, filterCallback, 0, 1)[0] || def;
     };
 
     HALSONResource.prototype.addLink = function(rel, link) {

@@ -123,10 +123,11 @@ var twitterLinks = resource.getLinks('related', function(item) {
 });
 ```
 
-### `HALSONResource#getLink(rel, [filterCallback])`
+### `HALSONResource#getLink(rel, [filterCallback, [default]])`
 Get first link with relation `rel`.
  * `rel` (required): Relation name.
  * `filterCallback` (optional): Function used to filter array of links. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.20)
+ * `default` (optional): Default value if the link does not exist.
 
 ```js
 var firstRelatedLink = resource.getLink('related');
@@ -142,15 +143,15 @@ Get all embedded resources with relation `rel`.
 var embeds = resource.getEmbeds('starred');
 ```
 
-### `HALSONResource#getEmbed(rel, [filterCallback])`
+### `HALSONResource#getEmbed(rel, [filterCallback, [default]])`
 Get first embedded resource with relation `rel`.
  * `rel` (required): Relation name.
  * `filterCallback` (optional): Function used to filter array of embeds. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.20)
+ * `default` (optional): Default value if the link does not exist.
 
 ```js
 var nodeProject = resource.getEmbed('starred', function(embed) {
-    var selfLink = embed.getLink('self') || {};
-    return selfLink.href === '/joyent/node';
+    return embed.getLink('self', {}).href === '/joyent/node';
 });
 ```
 
@@ -203,7 +204,6 @@ Remove embedded resources with relation `rel`. If `filterCallback` is not define
 ```js
 // remove embedded resources with relation 'starred' and self-link '/koajs/koa'
 resource.removeLinks('starred', function(embed) {
-    var selfLink = embed.getLink('self') || {};
-    return selfLink.href === '/koajs/koa';
+    return embed.getLink('self', {}).href === '/koajs/koa';
 });
 ```

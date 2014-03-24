@@ -277,6 +277,12 @@ describe('halson', function() {
             expect(res).to.be.an("undefined");
         });
 
+        it('return default value', function(){
+            var def = {title: 'Untitled'};
+            var res = halson().getLink('selfX', def);
+            assert.deepEqual(res, def);
+        });
+
         it('return link by rel', function() {
             var res = halson(clone(example));
 
@@ -298,6 +304,14 @@ describe('halson', function() {
             assert.deepEqual(res.getLink('related', function(item) {
                 return true;
             }), example._links.related[0]);
+        });
+
+        it('use filterCallback w/ default value', function(){
+            var res = halson(clone(example));
+            var def = {title: 'Untitled'};
+            assert.deepEqual(res.getLink('related', function(item) {
+                return item.name === "not exists";
+            }, def), def);
         });
     });
 
@@ -366,6 +380,12 @@ describe('halson', function() {
             assert.strictEqual(res.getEmbed('item'), undefined);
         });
 
+        it('return default value', function() {
+            var res = halson();
+            var def = {title:'Untitled'};
+            assert.deepEqual(res.getEmbed('item', def), def);
+        });
+
         it('return embed by rel', function() {
             var res = halson(clone(example));
             var expected = halson(example._embedded.starred[0]);
@@ -376,8 +396,16 @@ describe('halson', function() {
             var res = halson(clone(example));
             var expected = halson(example._embedded.starred[1]);
             assert.deepEqual(res.getEmbed('starred', function(item) {
-                return item.title == "koajs / koa";
+                return item.title === "koajs / koa";
             }), expected);
+        });
+
+        it('use filterCallback w/ default value', function() {
+            var res = halson(clone(example));
+            var def = {title: 'Untitled'};
+            assert.deepEqual(res.getEmbed('starred', function(item) {
+                return item.title === "not exists";
+            }, def), def);
         });
     });
 
