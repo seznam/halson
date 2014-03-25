@@ -68,8 +68,8 @@ resource = halson({
 });
 
 // resource from another resource (no-op)
-var resourceX = halson(resorce);
-console.log(resorce === resorceX); // true
+var resourceX = halson(resource);
+console.log(resource === resourceX); // true
 ```
 
 
