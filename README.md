@@ -11,6 +11,12 @@ The [HAL+JSON](http://stateless.co/hal_specification.html) Resource Object.
 npm install halson --save
 ```
 
+### Bower
+
+```sh
+bower install halson --save
+```
+
 ## Example
 ```js
 var halson = require('halson');
