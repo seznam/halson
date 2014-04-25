@@ -86,7 +86,7 @@
             links = links.filter(filterCallback);
         }
 
-        return links.slice(begin || 0, end);
+        return links.slice(begin || 0, end || links.length);
     };
 
     HALSONResource.prototype.getLink = function(rel, filterCallback, def) {
@@ -108,7 +108,7 @@
             items = items.filter(filterCallback);
         }
 
-        return items.slice(begin || 0, end);
+        return items.slice(begin || 0, end || items.length);
     };
 
     HALSONResource.prototype.getEmbed = function(rel, filterCallback, def) {
