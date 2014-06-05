@@ -412,7 +412,7 @@ describe('halson', function() {
     describe('addLink()', function() {
         it('return this', function() {
             var res = halson();
-            ret = res.addLink('self', '/hajovsky');
+            var ret = res.addLink('self', '/hajovsky');
             expect(ret).to.be.equal(res);
         });
 
