@@ -159,6 +159,25 @@
         return this;
     };
 
+    HALSONResource.prototype.prependEmbed = function(rel, embed) {
+        var item = createHALSONResource(embed);
+
+        if (!this._embedded) {
+            this._embedded = {};
+        }
+
+        if (!(rel in this._embedded)) {
+            // first embed
+            this._embedded[rel] = item;
+            // multiple embeds
+        } else {
+            this._embedded[rel] = [].concat(this._embedded[rel]);
+            this._embedded[rel].unshift(item);
+        }
+
+        return this;
+    };
+
     HALSONResource.prototype.removeLinks = function(rel, filterCallback) {
         if (!this._links || !(rel in this._links)) {
             return;
