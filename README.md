@@ -190,6 +190,21 @@ var embed = {
 resource.addEmbed('starred', embed);
 ```
 
+### `HALSONResource#prependEmbed(rel, embed)`
+Prepend a nested resource with relation `rel`.
+ * `rel` (required): Relation name.
+ * `embed` (required): Resource to be embedded (Object or HALSONResource).
+
+```js
+var embed = {
+    _links: {
+        self: {href: '/joyent/node'}
+    },
+    title: "joyent / node"
+}
+resource.prependEmbed('starred', embed);
+```
+
 ### `HALSONResource#removeLinks(rel, [filterCallback])`
 Remove links with relation `rel`. If `filterCallback` is not defined, all links with relation `rel` will be removed.
  * `rel` (required): Relation name.
