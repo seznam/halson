@@ -412,7 +412,7 @@ describe('halson', function() {
     describe('addLink()', function() {
         it('return this', function() {
             var res = halson();
-            var ret = res.addLink('self', '/hajovsky');
+            ret = res.addLink('self', '/hajovsky');
             expect(ret).to.be.equal(res);
         });
 
@@ -482,6 +482,47 @@ describe('halson', function() {
 
             res.addEmbed('item', embed1);
             res.addEmbed('item', embed2);
+            assert.deepEqual(res, expected);
+        });
+    });
+
+    describe('prependEmbed()', function() {
+        it('return this', function(){
+            var res = halson();
+            expect(res).to.be.equal(res.addEmbed('starred', {title: 'Untitled'}));
+        });
+
+        it('prepend first embed', function() {
+            var res = halson();
+            var embed = {title: "Untitled"};
+            var expected = {
+                _embedded: {
+                    item: {
+                        title: "Untitled"
+                    }
+                }
+            };
+
+            res.prependEmbed('item', embed);
+            assert.deepEqual(res, expected);
+        });
+
+        it('prepend second embed', function() {
+            var res = halson();
+            var embed1 = {title: "Untitled1"};
+            var embed2 = {title: "Untitled2"};
+            var expected = {
+                _embedded: {
+                    item: [{
+                        title: "Untitled2"
+                    }, {
+                        title: "Untitled1"
+                    }]
+                }
+            };
+
+            res.prependEmbed('item', embed1);
+            res.prependEmbed('item', embed2);
             assert.deepEqual(res, expected);
         });
     });
