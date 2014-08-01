@@ -1,6 +1,6 @@
 # Changelog
 
-## Release 2.1.2 (2014-08-01)
+## Release 2.2.0 (2014-08-01)
  * added prependEmbed method
 
 ## Release 2.1.1 (2014-04-25)
