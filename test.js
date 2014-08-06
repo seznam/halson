@@ -7,25 +7,25 @@ var bowerPkg = require('./bower.json');
 var example = {
     _links: {
         self: {
-            href: '/hajovsky',
+            href: "/hajovsky",
         },
         avatar: {
-            href: 'https://avatars0.githubusercontent.com/u/113901?s=460',
-            type: 'image/jpeg'
+            href: "https://avatars0.githubusercontent.com/u/113901?s=460",
+            type: "image/jpeg"
         },
         related: [{
-            href: 'http://hajovsky.sk',
-            name: 'homepage'
+            href: "http://hajovsky.sk",
+            name: "homepage"
         }, {
-            href: 'https://twitter.com/hajovsky',
-            name: 'twitter'
+            href: "https://twitter.com/hajovsky",
+            name: "twitter"
         }]
     },
-    title: 'Juraj Hájovský',
-    username: 'hajovsky',
+    title: "Juraj Hájovský",
+    username: "hajovsky",
     emails: [
-        'juraj.hajovsky@example.com',
-        'hajovsky@example.com'
+        "juraj.hajovsky@example.com",
+        "hajovsky@example.com"
     ],
     stats: {
         starred: 3,
@@ -33,26 +33,26 @@ var example = {
         following: 0
 
     },
-    joined: '2009-08-10T00:00:00.000Z',
+    joined: "2009-08-10T00:00:00.000Z",
     _embedded: {
         starred: [
             {
                 _links: {
                     self: {
-                        href: '/joyent/node'
+                        href: "/joyent/node"
                     },
                     related: {
-                        href: 'http://nodejs.org/',
-                        title: 'nodejs.org',
-                        name: 'website'
+                        href: "http://nodejs.org/",
+                        title: "nodejs.org",
+                        name: "website"
                     },
                     author: {
-                        href: '/joyent',
-                        title: 'Joyent'
+                        href: "/joyent",
+                        title: "Joyent"
                     }
                 },
-                title: 'joyent / node',
-                description: 'evented I/O for v8 javascript',
+                title: "joyent / node",
+                description: "evented I/O for v8 javascript",
                 stats: {
                     watched: 2092,
                     starred: 28426,
@@ -62,20 +62,20 @@ var example = {
             {
                 _links: {
                     self: {
-                        href: '/koajs/koa'
+                        href: "/koajs/koa"
                     },
                     related: {
-                        href: 'http://koajs.com',
-                        title: 'koajs.com',
-                        name: 'website'
+                        href: "http://koajs.com",
+                        title: "koajs.com",
+                        name: "website"
                     },
                     author: {
-                        href: '/koajs',
-                        title: 'koajs'
+                        href: "/koajs",
+                        title: "koajs"
                     }
                 },
-                title: 'koajs / koa',
-                description: 'Expressive middleware for node.js using generators',
+                title: "koajs / koa",
+                description: "Expressive middleware for node.js using generators",
                 stats: {
                     watched: 238,
                     starred: 3193,
@@ -85,15 +85,15 @@ var example = {
             {
                 _links: {
                     self: {
-                        href: '/pgte/nock'
+                        href: "/pgte/nock"
                     },
                     author: {
-                        href: '/pgte',
-                        title: 'Pedro Teixeira'
+                        href: "/pgte",
+                        title: "Pedro Teixeira"
                     }
                 },
-                title: 'pgte / nock',
-                description: 'HTTP mocking and expectations library',
+                title: "pgte / nock",
+                description: "HTTP mocking and expectations library",
                 stats: {
                     watched: 22,
                     starred: 803,
@@ -109,7 +109,7 @@ function clone(data) {
 }
 
 function dump(obj) {
-    console.log(JSON.stringify(obj, null, '  '));
+    console.log(JSON.stringify(obj, null, "  "));
 }
 
 describe('halson', function() {
@@ -156,7 +156,7 @@ describe('halson', function() {
         });
 
         it('prevent double conversion', function() {
-            var data = {title:'Untitled'};
+            var data = { title: "Untitled"};
             var res1 = halson(data);
             var res2 = halson(res1);
             expect(res1).to.be.equal(res2);
@@ -278,7 +278,7 @@ describe('halson', function() {
         });
 
         it('return default value', function(){
-            var def = {title: 'Untitled'};
+            var def = {title: "Untitled"};
             var res = halson().getLink('selfX', def);
             assert.deepEqual(res, def);
         });
@@ -308,7 +308,7 @@ describe('halson', function() {
 
         it('use filterCallback w/ default value', function(){
             var res = halson(clone(example));
-            var def = {title: 'Untitled'};
+            var def = {title: "Untitled"};
             assert.deepEqual(res.getLink('related', function(item) {
                 return item.name === 'not exists';
             }, def), def);
@@ -382,7 +382,7 @@ describe('halson', function() {
 
         it('return default value', function() {
             var res = halson();
-            var def = {title:'Untitled'};
+            var def = {title: "Untitled"};
             assert.deepEqual(res.getEmbed('item', def), def);
         });
 
@@ -402,7 +402,7 @@ describe('halson', function() {
 
         it('use filterCallback w/ default value', function() {
             var res = halson(clone(example));
-            var def = {title: 'Untitled'};
+            var def = {title: "Untitled"};
             assert.deepEqual(res.getEmbed('starred', function(item) {
                 return item.title === 'not exists';
             }, def), def);
@@ -418,9 +418,7 @@ describe('halson', function() {
 
         it('add first link (Object)', function() {
             var res = halson();
-            var link = {
-                href: '/hajovsky'
-            };
+            var link = {href: "/hajovsky"};
 
             res.addLink('self', link);
             assert.deepEqual(res.getLink('self'), link);
@@ -428,9 +426,7 @@ describe('halson', function() {
 
         it('add first link (string)', function() {
             var res = halson();
-            var link = {
-                href: '/hajovsky'
-            };
+            var link = {href: "/hajovsky"};
 
             res.addLink('self', link.href);
             assert.deepEqual(res.getLink('self'), link);
@@ -453,11 +449,11 @@ describe('halson', function() {
 
         it('add first embed', function() {
             var res = halson();
-            var embed = {title: 'Untitled'};
+            var embed = {title: "Untitled"};
             var expected = {
                 _embedded: {
                     item: {
-                        title: 'Untitled'
+                        title: "Untitled"
                     }
                 }
             };
@@ -468,11 +464,11 @@ describe('halson', function() {
 
         it('add first embed array', function() {
             var res = halson();
-            var embed = [{title: 'Untitled'}];
+            var embed = [{title: "Untitled"}];
             var expected = {
                 _embedded: {
                     item: [{
-                        title: 'Untitled'
+                        title: "Untitled"
                     }]
                 }
             };
@@ -483,14 +479,14 @@ describe('halson', function() {
 
         it('add second embed', function() {
             var res = halson();
-            var embed1 = {title: 'Untitled1'};
-            var embed2 = [{title: 'Untitled2'}];
+            var embed1 = {title: "Untitled1"};
+            var embed2 = [{title: "Untitled2"}];
             var expected = {
                 _embedded: {
                     item: [{
-                        title: 'Untitled1'
+                        title: "Untitled1"
                     }, {
-                        title: 'Untitled2'
+                        title: "Untitled2"
                     }]
                 }
             };
@@ -502,15 +498,15 @@ describe('halson', function() {
 
         it('add first embed array', function() {
             var res = halson();
-            var embed = [{title: 'Untitled1'}, {title: 'Untitled2'}];
+            var embed = [{title: "Untitled1"}, {title: "Untitled2"}];
             var expected = {
                 _embedded: {
                     item: [
                         {
-                            title: 'Untitled1'
+                            title: "Untitled1"
                         },
                         {
-                            title: 'Untitled2'
+                            title: "Untitled2"
                         }
                     ]
                 }
@@ -522,22 +518,22 @@ describe('halson', function() {
 
         it('add second embed array', function() {
             var res = halson();
-            var embed1 = [{title: 'Untitled1'}, {title: 'Untitled2'}];
-            var embed2 = [{title: 'Untitled3'}, {title: 'Untitled4'}];
+            var embed1 = [{title: "Untitled1"}, {title: "Untitled2"}];
+            var embed2 = [{title: "Untitled3"}, {title: "Untitled4"}];
             var expected = {
                 _embedded: {
                     item: [
                         {
-                            title: 'Untitled1'
+                            title: "Untitled1"
                         },
                         {
-                            title: 'Untitled2'
+                            title: "Untitled2"
                         },
                         {
-                            title: 'Untitled3'
+                            title: "Untitled3"
                         },
                         {
-                            title: 'Untitled4'
+                            title: "Untitled4"
                         }
                     ]
                 }
