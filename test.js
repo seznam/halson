@@ -1,5 +1,7 @@
+'use strict';
+
 var assert = require('assert');
-var expect = require('chai').expect;
+var expect = require('../chai/chai.js').expect;
 var halson = require('./index');
 var nodePkg = require('./package.json');
 var bowerPkg = require('./bower.json');
@@ -7,25 +9,25 @@ var bowerPkg = require('./bower.json');
 var example = {
     _links: {
         self: {
-            href: "/hajovsky",
+            href: '/hajovsky',
         },
         avatar: {
-            href: "https://avatars0.githubusercontent.com/u/113901?s=460",
-            type: "image/jpeg"
+            href: 'https://avatars0.githubusercontent.com/u/113901?s=460',
+            type: 'image/jpeg'
         },
         related: [{
-            href: "http://hajovsky.sk",
-            name: "homepage"
+            href: 'http://hajovsky.sk',
+            name: 'homepage'
         }, {
-            href: "https://twitter.com/hajovsky",
-            name: "twitter"
+            href: 'https://twitter.com/hajovsky',
+            name: 'twitter'
         }]
     },
-    title: "Juraj Hájovský",
-    username: "hajovsky",
+    title: 'Juraj Hájovský',
+    username: 'hajovsky',
     emails: [
-        "juraj.hajovsky@example.com",
-        "hajovsky@example.com"
+        'juraj.hajovsky@example.com',
+        'hajovsky@example.com'
     ],
     stats: {
         starred: 3,
@@ -33,7 +35,7 @@ var example = {
         following: 0
 
     },
-    joined: "2009-08-10T00:00:00.000Z",
+    joined: '2009-08-10T00:00:00.000Z',
     _embedded: {
         starred: [
             {
@@ -51,8 +53,8 @@ var example = {
                         title: 'Joyent'
                     }
                 },
-                title: "joyent / node",
-                description: "evented I/O for v8 javascript",
+                title: 'joyent / node',
+                description: 'evented I/O for v8 javascript',
                 stats: {
                     watched: 2092,
                     starred: 28426,
@@ -74,8 +76,8 @@ var example = {
                         title: 'koajs'
                     }
                 },
-                title: "koajs / koa",
-                description: "Expressive middleware for node.js using generators",
+                title: 'koajs / koa',
+                description: 'Expressive middleware for node.js using generators',
                 stats: {
                     watched: 238,
                     starred: 3193,
@@ -92,8 +94,8 @@ var example = {
                         title: 'Pedro Teixeira'
                     }
                 },
-                title: "pgte / nock",
-                description: "HTTP mocking and expectations library",
+                title: 'pgte / nock',
+                description: 'HTTP mocking and expectations library',
                 stats: {
                     watched: 22,
                     starred: 803,
@@ -127,7 +129,7 @@ describe('halson', function() {
         it('create without data', function() {
             var res = halson();
             var expected = {};
-            expect(res.className).to.be.a("string");
+            expect(res.className).to.be.a('string');
             expect(res.className).to.be.equal(halson.Resource.prototype.className);
             assert.deepEqual(res, expected);
         });
@@ -138,14 +140,14 @@ describe('halson', function() {
             assert.deepEqual(res, expected);
         });
 
-        it("ignore prototype of data", function() {
-            function x() {
+        it('ignore prototype of data', function() {
+            function X() {
                 this.dolor = 'sit';
             }
-            x.prototype.lorem = 'ipsum';
-            var data = new x();
+            X.prototype.lorem = 'ipsum';
+            var data = new X();
             var res = halson(data);
-            expect(res.lorem).to.be.an("undefined");
+            expect(res.lorem).to.be.an('undefined');
             expect(res.dolor).to.be.equal('sit');
         });
 
@@ -186,7 +188,7 @@ describe('halson', function() {
             var res = halson();
             res._embedded = {};
             res._compact('_embedded');
-            expect(res._embedded).to.be.an("undefined");
+            expect(res._embedded).to.be.an('undefined');
         });
     });
 
@@ -239,13 +241,13 @@ describe('halson', function() {
 
         it('use filterCallback', function() {
             var expected = [{
-                href: "https://twitter.com/hajovsky",
-                name: "twitter"
+                href: 'https://twitter.com/hajovsky',
+                name: 'twitter'
             }];
 
             var res = halson(clone(example));
             var links = res.getLinks('related', function(item) {
-                return item.name === "twitter";
+                return item.name === 'twitter';
             });
             assert.deepEqual(links, expected);
 
@@ -271,10 +273,10 @@ describe('halson', function() {
     describe('getLink()', function() {
         it('return undefined', function() {
             var res = halson().getLink('selfX');
-            expect(res).to.be.an("undefined");
+            expect(res).to.be.an('undefined');
 
             res = halson(clone(example)).getLink('selfX');
-            expect(res).to.be.an("undefined");
+            expect(res).to.be.an('undefined');
         });
 
         it('return default value', function(){
@@ -298,7 +300,7 @@ describe('halson', function() {
             }), example._links.avatar);
 
             assert.deepEqual(res.getLink('related', function(item) {
-                return item.name === "twitter";
+                return item.name === 'twitter';
             }), example._links.related[1]);
 
             assert.deepEqual(res.getLink('related', function(item) {
@@ -310,7 +312,7 @@ describe('halson', function() {
             var res = halson(clone(example));
             var def = {title: 'Untitled'};
             assert.deepEqual(res.getLink('related', function(item) {
-                return item.name === "not exists";
+                return item.name === 'not exists';
             }, def), def);
         });
     });
@@ -359,7 +361,7 @@ describe('halson', function() {
 
         it('use begin/end', function() {
             var res = halson(clone(example));
-            expected = example._embedded.starred.map(function(item) {
+            var expected = example._embedded.starred.map(function(item) {
                 return halson(item);
             });
 
@@ -396,7 +398,7 @@ describe('halson', function() {
             var res = halson(clone(example));
             var expected = halson(example._embedded.starred[1]);
             assert.deepEqual(res.getEmbed('starred', function(item) {
-                return item.title === "koajs / koa";
+                return item.title === 'koajs / koa';
             }), expected);
         });
 
@@ -404,7 +406,7 @@ describe('halson', function() {
             var res = halson(clone(example));
             var def = {title: 'Untitled'};
             assert.deepEqual(res.getEmbed('starred', function(item) {
-                return item.title === "not exists";
+                return item.title === 'not exists';
             }, def), def);
         });
     });
@@ -453,12 +455,27 @@ describe('halson', function() {
 
         it('add first embed', function() {
             var res = halson();
-            var embed = {title: "Untitled"};
+            var embed = {title: 'Untitled'};
             var expected = {
                 _embedded: {
                     item: {
-                        title: "Untitled"
+                        title: 'Untitled'
                     }
+                }
+            };
+
+            res.addEmbed('item', embed);
+            assert.deepEqual(res, expected);
+        });
+
+        it('add first embed array', function() {
+            var res = halson();
+            var embed = [{title: 'Untitled'}];
+            var expected = {
+                _embedded: {
+                    item: [{
+                        title: 'Untitled'
+                    }]
                 }
             };
 
@@ -468,14 +485,14 @@ describe('halson', function() {
 
         it('add second embed', function() {
             var res = halson();
-            var embed1 = {title: "Untitled1"};
-            var embed2 = {title: "Untitled2"};
+            var embed1 = {title: 'Untitled1'};
+            var embed2 = [{title: 'Untitled2'}];
             var expected = {
                 _embedded: {
                     item: [{
-                        title: "Untitled1"
+                        title: 'Untitled1'
                     }, {
-                        title: "Untitled2"
+                        title: 'Untitled2'
                     }]
                 }
             };
@@ -484,6 +501,55 @@ describe('halson', function() {
             res.addEmbed('item', embed2);
             assert.deepEqual(res, expected);
         });
+
+        it('add first embed array', function() {
+            var res = halson();
+            var embed = [{title: 'Untitled1'}, {title: 'Untitled2'}];
+            var expected = {
+                _embedded: {
+                    item: [
+                        {
+                            title: 'Untitled1'
+                        },
+                        {
+                            title: 'Untitled2'
+                        }
+                    ]
+                }
+            };
+
+            res.addEmbed('item', embed);
+            assert.deepEqual(res, expected);
+        });
+
+        it('add second embed array', function() {
+            var res = halson();
+            var embed1 = [{title: 'Untitled1'}, {title: 'Untitled2'}];
+            var embed2 = [{title: 'Untitled3'}, {title: 'Untitled4'}];
+            var expected = {
+                _embedded: {
+                    item: [
+                        {
+                            title: 'Untitled1'
+                        },
+                        {
+                            title: 'Untitled2'
+                        },
+                        {
+                            title: 'Untitled3'
+                        },
+                        {
+                            title: 'Untitled4'
+                        }
+                    ]
+                }
+            };
+
+            res.addEmbed('item', embed1);
+            res.addEmbed('item', embed2);
+            assert.deepEqual(res, expected);
+        });
+
     });
 
     describe('removeLinks()', function() {
@@ -505,7 +571,7 @@ describe('halson', function() {
         it('use filterCallback', function() {
             var res = halson(clone(example));
             res.removeLinks('related', function(item) {
-                return item.name === "twitter";
+                return item.name === 'twitter';
             });
             var expected = clone(example._links);
             expected.related = expected.related[0];
@@ -518,7 +584,7 @@ describe('halson', function() {
             var res = halson(clone(example));
             res.removeEmbeds('starred');
             assert.deepEqual(res._embedded, {});
-            expect(res._embedded.starred).to.be.an("undefined");
+            expect(res._embedded.starred).to.be.an('undefined');
         });
 
         it('ignore missing embeds', function() {
@@ -531,7 +597,7 @@ describe('halson', function() {
         it('use filterCallback', function() {
             var res = halson(clone(example));
             res.removeEmbeds('starred', function(item){
-                return item.title === "koajs / koa";
+                return item.title === 'koajs / koa';
             });
             var embeds = res.getEmbeds('starred');
 
