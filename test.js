@@ -1,5 +1,5 @@
 var assert = require('assert');
-var expect = require('../chai/chai.js').expect;
+var expect = require('chai').expect;
 var halson = require('./index');
 var nodePkg = require('./package.json');
 var bowerPkg = require('./bower.json');
