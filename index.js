@@ -161,7 +161,6 @@
         } else {
             // later embeds
             this._embedded[rel] = [].concat(this._embedded[rel]);
-            item = [].concat(item);
             Array.prototype.push.apply(this._embedded[rel], item);
         }
 
