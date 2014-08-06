@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+  - '0.10'
+  - '0.11'
+deploy:
+  provider: npm
+  email: juraj@hajovsky.sk
+  api_key:
+    secure: d+ErF9wNPY08/MjyEH3hivM6Hga+WIrDPb/mbfGb5KbGmY5+vMAF0trI7GTbwD88Yy/ldyxxigW/pyNIxdfZefytzDAcJotzEVyGpfPiPmDID3e4/NLZvcZ2OVo3VPwpgLtOBfF/sF1tEZThyf0WEnQ/A0ajDgSh/TD9jIzidXA=
+  on:
+    tags: true
+    repo: seznam/halson

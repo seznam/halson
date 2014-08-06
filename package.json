@@ -1,0 +1,41 @@
+{
+  "name": "halson",
+  "version": "2.1.1",
+  "description": "The HAL+JSON Resource Object",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter spec test.js"
+  },
+  "keywords": [
+    "HAL",
+    "JSON",
+    "REST",
+    "Hypermedia",
+    "HATEOAS",
+    "API"
+  ],
+  "author": {
+    "name": "Juraj Hájovský",
+    "email": "juraj@hajovsky.sk",
+    "url": "http://hajovsky.sk"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "~1.18.0",
+    "chai": "^1.9.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seznam/halson"
+  },
+  "readme": "# HALSON\n[![Build Status](https://travis-ci.org/seznam/halson.svg?branch=master)](https://travis-ci.org/seznam/halson)\n\nThe [HAL+JSON](http://stateless.co/hal_specification.html) Resource Object.\n\n## Installation\n\n### node.js\n\n```sh\nnpm install halson --save\n```\n\n### Bower\n\n```sh\nbower install halson --save\n```\n\n## Example\n```js\nvar halson = require('halson');\n\nvar embed = halson({\n        title: \"joyent / node\",\n        description: \"evented I/O for v8 javascript\"\n    })\n    .addLink('self', '/joyent/node')\n    .addLink('author', {\n        href: '/joyent',\n        title: 'Joyent'\n    });\n\nvar resource = halson({\n        title: \"Juraj Hájovský\",\n        username: \"hajovsky\",\n        emails: [\n            \"juraj.hajovsky@example.com\",\n            \"hajovsky@example.com\"\n        ]\n    })\n    .addLink('self', '/hajovsky')\n    .addEmbed('starred', embed);\n\nconsole.log(resource.title);\nconsole.log(resource.emails[0]);\nconsole.log(resource.getLink('self'));\nconsole.log(resource.getEmbed('starred'));\nconsole.log(JSON.stringify(resource));\n```\n\n\n## API\n\n### `halson([data])`\nCreate a new HAL+JSON Resource Object.\n * `data` (optional): Initial data as serialized string or Object.\n\n```js\n// empty HAL+JSON Resource Object\nvar resource = halson();\n\n// resource from a serialized data\nvar resource = halson('{title:\"Lorem Ipsum\",_links:{self:{href:\"/ipsum\"}}');\n\n// resource from an Object\nresource = halson({\n    _links: {\n        self: {\n            href: {\"/ipsum\"}\n        }\n    },\n    title: \"Lorem Ipsum\"\n});\n\n// resource from another resource (no-op)\nvar resourceX = halson(resource);\nconsole.log(resource === resourceX); // true\n```\n\n\n### `HALSONResource#listLinkRels()`\nList all link relations.\n\n```js\nvar data = {\n    _links: {\n        self: {href: '/hajovsky'},\n        related: [\n            {href: 'http://hajovsky.sk'},\n            {href: 'https://twitter.com/hajovsky'}\n        ]\n    }\n}\n\nvar resource = halson(data);\nconsole.log(resource.listLinkRels()); // ['self', 'related']\n```\n\n### `HALSONResource#listEmbedRels()`\nList all link relations.\n\n```js\nvar data = {\n    _embedded: {\n        starred: {\n            _links: {\n                self: {href: '/joyent/node'}\n            }\n            title: \"joyent / node\",\n            description: \"evented I/O for v8 javascript\"\n        }\n    }\n}\n\nvar resource = halson(data);\nconsole.log(resource.listEmbedRels()); // ['starred']\n```\n\n### `HALSONResource#getLinks(rel, [filterCallback, [begin, [end]]])`\nGet all links with relation `rel`.\n * `rel` (required): Relation name.\n * `filterCallback` (optional): Function used to filter array of links. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.20)\n * `begin`, `end` (optional): slice filtered links. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.10)\n\n```js\nvar twitterLinks = resource.getLinks('related', function(item) {\n    return item.name === \"twitter\";\n});\n```\n\n### `HALSONResource#getLink(rel, [filterCallback, [default]])`\nGet first link with relation `rel`.\n * `rel` (required): Relation name.\n * `filterCallback` (optional): Function used to filter array of links. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.20)\n * `default` (optional): Default value if the link does not exist.\n\n```js\nvar firstRelatedLink = resource.getLink('related');\n```\n\n### `HALSONResource#getEmbeds(rel, [filterCallback, [begin, [end]]])`\nGet all embedded resources with relation `rel`.\n * `rel` (required): Relation name.\n * `filterCallback` (optional): Function used to filter array of embeds. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.20)\n * `begin`, `end` (optional): slice filtered links. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.10)\n\n```js\nvar embeds = resource.getEmbeds('starred');\n```\n\n### `HALSONResource#getEmbed(rel, [filterCallback, [default]])`\nGet first embedded resource with relation `rel`.\n * `rel` (required): Relation name.\n * `filterCallback` (optional): Function used to filter array of embeds. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.20)\n * `default` (optional): Default value if the link does not exist.\n\n```js\nvar nodeProject = resource.getEmbed('starred', function(embed) {\n    return embed.getLink('self', {}).href === '/joyent/node';\n});\n```\n\n### `HALSONResource#addLink(rel, link)`\nAdd a link with relation `rel`.\n * `rel` (required): Relation name.\n * `link` (required): Link to be added (string or Object).\n\n```js\nresource\n    .addLink('related', 'http://hajovsky.sk')\n    .addLink('related', {\n        href: 'https://twitter.com/hajovsky',\n        name: 'twitter'\n    });\n```\n\n### `HALSONResource#addEmbed(rel, embed)`\nAdd a nested resource with relation `rel`.\n * `rel` (required): Relation name.\n * `embed` (required): Resource to be embedded (Object or HALSONResource).\n\n```js\nvar embed = {\n    _links: {\n        self: {href: '/joyent/node'}\n    },\n    title: \"joyent / node\"\n}\nresource.addEmbed('starred', embed);\n```\n\n### `HALSONResource#removeLinks(rel, [filterCallback])`\nRemove links with relation `rel`. If `filterCallback` is not defined, all links with relation `rel` will be removed.\n * `rel` (required): Relation name.\n * `filterCallback` (optional): Function used to filter array of links. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.20)\n\n```js\n// remove links with relation 'related' and name 'twitter'\nresource.removeLinks('related', function(link) {\n    return link.name === \"twitter\";\n});\n```\n\n### `HALSONResource#removeEmbeds(rel, [filterCallback])`\nRemove embedded resources with relation `rel`. If `filterCallback` is not defined, all embeds with relation `rel` will be removed.\n * `rel` (required): Relation name.\n * `filterCallback` (optional): Function used to filter array of links. [doc](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.20)\n\n```js\n// remove embedded resources with relation 'starred' and self-link '/koajs/koa'\nresource.removeLinks('starred', function(embed) {\n    return embed.getLink('self', {}).href === '/koajs/koa';\n});\n```\n",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/seznam/halson/issues"
+  },
+  "homepage": "https://github.com/seznam/halson",
+  "_id": "halson@2.1.1",
+  "_shasum": "9127805ffa65943c9d092dcc76e3a611b63167d1",
+  "_resolved": "git://github.com/thruttle/halson.git#4f207846da7bde74ae7fef1da6915998af78fc91",
+  "_from": "halson@git://github.com/thruttle/halson.git"
+}
