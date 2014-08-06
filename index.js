@@ -1,5 +1,3 @@
-'use strict';
-
 (function(module, win) {
     function HALSONResource(data) {
         data = data || {};
