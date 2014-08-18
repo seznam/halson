@@ -486,6 +486,70 @@ describe('halson', function() {
         });
     });
 
+    describe('insertEmbed()', function() {
+        it('return this', function(){
+            var res = halson();
+            expect(res).to.be.equal(res.addEmbed('starred', {title: 'Untitled'}));
+        });
+
+        it('add first embed', function() {
+            var res = halson();
+            var embed = {title: "Untitled"};
+            var expected = {
+                _embedded: {
+                    item: {
+                        title: "Untitled"
+                    }
+                }
+            };
+
+            res.insertEmbed('item', -1, embed);
+            assert.deepEqual(res, expected);
+        });
+
+        it('add second embed before first embed', function() {
+            var res = halson();
+            var embed1 = {title: "Untitled1"};
+            var embed2 = {title: "Untitled2"};
+            var expected = {
+                _embedded: {
+                    item: [{
+                        title: "Untitled2"
+                    }, {
+                        title: "Untitled1"
+                    }]
+                }
+            };
+
+            res.insertEmbed('item', -1, embed1);
+            res.insertEmbed('item', 0, embed2);
+            assert.deepEqual(res, expected);
+        });
+
+        it('add third embed before second', function() {
+            var res = halson();
+            var embed1 = {title: "Untitled1"};
+            var embed2 = {title: "Untitled2"};
+            var embed3 = {title: "Untitled3"};
+            var expected = {
+                _embedded: {
+                    item: [{
+                        title: "Untitled1"
+                    },{
+                        title: "Untitled3"
+                    },{
+                        title: "Untitled2"
+                    }]
+                }
+            };
+
+            res.insertEmbed('item', -1, embed1);
+            res.insertEmbed('item', -1, embed2);
+            res.insertEmbed('item', 1, embed3);
+            assert.deepEqual(res, expected);
+        });
+    });
+
     describe('removeLinks()', function() {
         it('remove all links by rel', function() {
             var res = halson(clone(example));

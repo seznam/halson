@@ -1,5 +1,8 @@
 # Changelog
 
+## Release 2.2.0 (2014-08-18)
+ * added insertEmbed method
+
 ## Release 2.1.1 (2014-04-25)
  * Fixed IE8 Array.slice() call
 

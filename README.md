@@ -190,6 +190,30 @@ var embed = {
 resource.addEmbed('starred', embed);
 ```
 
+### `HALSONResource#insertEmbed(rel, index, embed)`
+Add a nested resource with relation `rel`.
+ * `rel` (required): Relation name.
+ * `index` (required): Index number where embed will be inserted
+ * `embed` (required): Resource to be embedded (Object or HALSONResource).
+
+```js
+var embed = {
+    _links: {
+        self: {href: '/joyent/node'}
+    },
+    title: "joyent / node"
+};
+resource.addEmbed('starred', embed); // add embed
+
+var embed2 = {
+    _links: {
+        self: {href: '/joyent/node'}
+    },
+    title: "joyent / node"
+};
+resource.insertEmbed('starred', 0, embed2); // insert new embed before first item
+```
+
 ### `HALSONResource#removeLinks(rel, [filterCallback])`
 Remove links with relation `rel`. If `filterCallback` is not defined, all links with relation `rel` will be removed.
  * `rel` (required): Relation name.
