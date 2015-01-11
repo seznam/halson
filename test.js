@@ -467,9 +467,9 @@ describe('halson', function() {
             var embed = [{title: "Untitled"}];
             var expected = {
                 _embedded: {
-                    item: [{
+                    item: {
                         title: "Untitled"
-                    }]
+                    }
                 }
             };
 
@@ -597,6 +597,34 @@ describe('halson', function() {
                         title: "Untitled1"
                     },{
                         title: "Untitled3"
+                    },{
+                        title: "Untitled2"
+                    }]
+                }
+            };
+
+            res.insertEmbed('item', -1, embed1);
+            res.insertEmbed('item', -1, embed2);
+            res.insertEmbed('item', 1, embed3);
+            assert.deepEqual(res, expected);
+        });
+
+        it('add third embed (as an array) before second', function() {
+            var res = halson();
+            var embed1 = {title: "Untitled1"};
+            var embed2 = {title: "Untitled2"};
+            var embed3 = [
+                {title: "Untitled3a"},
+                {title: "Untitled3b"},
+            ];
+            var expected = {
+                _embedded: {
+                    item: [{
+                        title: "Untitled1"
+                    },{
+                        title: "Untitled3a"
+                    },{
+                        title: "Untitled3b"
                     },{
                         title: "Untitled2"
                     }]

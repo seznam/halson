@@ -141,53 +141,30 @@
     };
 
     HALSONResource.prototype.addEmbed = function(rel, embed) {
-
-        var item;
-
-        if (!Array.isArray(embed)) {
-            item = createHALSONResource(embed);
-        }
-        else {
-            item = embed.map(createHALSONResource);
-        }
-
-        if (!this._embedded) {
-            this._embedded = {};
-        }
-
-        if (!(rel in this._embedded)) {
-            // first embed
-            this._embedded[rel] = item;
-        } else {
-            // later embeds
-            this._embedded[rel] = [].concat(this._embedded[rel]);
-            Array.prototype.push.apply(this._embedded[rel], item);
-        }
-
-        return this;
+        return this.insertEmbed(rel, -1, embed);
     };
 
     HALSONResource.prototype.insertEmbed = function(rel, index, embed) {
-        if (index < 0) {
-            // in case we get -1, it is appended to end of array
-            return this.addEmbed(rel, embed);
-        }
-
-        var item = createHALSONResource(embed);
+        var items = [].concat(embed).map(createHALSONResource);
 
         if (!this._embedded) {
             this._embedded = {};
         }
 
         if (!(rel in this._embedded)) {
-            // first embed
-            this._embedded[rel] = item;
-            // multiple embeds
-        } else {
-            this._embedded[rel] = [].concat(this._embedded[rel]);
-            this._embedded[rel].splice(index, 0, item);
+            this._embedded[rel] = [];
         }
 
+        this._embedded[rel] = [].concat(this._embedded[rel]);
+
+        if (index < 0) {
+            Array.prototype.push.apply(this._embedded[rel], items);
+        } else {
+            var params = [index, 0].concat(items);
+            Array.prototype.splice.apply(this._embedded[rel], params);
+        }
+
+        this._compact('_embedded', rel);
         return this;
     };
 
