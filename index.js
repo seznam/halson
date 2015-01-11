@@ -145,15 +145,16 @@
     };
 
     HALSONResource.prototype.insertEmbed = function(rel, index, embed) {
-        var items = [].concat(embed).map(createHALSONResource);
-
         if (!this._embedded) {
             this._embedded = {};
         }
 
         if (!(rel in this._embedded)) {
-            this._embedded[rel] = [];
+            this._embedded[rel] = Array.isArray(embed) ? embed.map(createHALSONResource) : createHALSONResource(embed);
+            return this;
         }
+
+        var items = [].concat(embed).map(createHALSONResource);
 
         this._embedded[rel] = [].concat(this._embedded[rel]);
 
