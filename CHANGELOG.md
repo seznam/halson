@@ -1,7 +1,10 @@
 # Changelog
 
+## Release 2.3.0 (2015-01-11)
+ * Altered addEmbed to accept an array as a second argument
+
 ## Release 2.2.0 (2014-08-18)
- * added insertEmbed method
+ * Added insertEmbed method
 
 ## Release 2.1.1 (2014-04-25)
  * Fixed IE8 Array.slice() call

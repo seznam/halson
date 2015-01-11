@@ -1,6 +1,6 @@
 {
   "name": "halson",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "The HAL+JSON Resource Object",
   "main": "index.js",
   "scripts": {
