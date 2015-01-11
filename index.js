@@ -2,7 +2,7 @@
     function HALSONResource(data) {
         data = data || {};
 
-        if (typeof data == "string") {
+        if (typeof data === 'string') {
             data = JSON.parse(data);
         }
 
@@ -12,7 +12,7 @@
             }
         }
 
-        if (this._embedded && (typeof this._embedded == "object")) {
+        if (this._embedded && (typeof this._embedded === 'object')) {
             var _embedded = {};
             var self = this;
             Object.keys(this._embedded).forEach(function(key) {
@@ -26,14 +26,14 @@
             this._embedded = _embedded;
         }
 
-        this._compact("_embedded");
-        this._compact("_links");
+        this._compact('_embedded');
+        this._compact('_links');
     }
 
     HALSONResource.prototype._compact = function(name, key) {
         var target = this[name];
 
-        if (typeof target != "object") {
+        if (typeof target !== 'object') {
             return;
         }
 
@@ -47,7 +47,7 @@
 
             if (!items.length) {
                 delete(target[k]);
-            } else if (items.length == 1) {
+            } else if (items.length === 1) {
                 target[k] = items[0];
             }
         });
@@ -59,7 +59,7 @@
         this[name] = target;
     };
 
-    HALSONResource.prototype.className = "HALSONResource";
+    HALSONResource.prototype.className = 'HALSONResource';
 
     HALSONResource.prototype._invert = function(filterCallback) {
         return function() {
@@ -90,7 +90,7 @@
     };
 
     HALSONResource.prototype.getLink = function(rel, filterCallback, def) {
-        if (typeof filterCallback != "function") {
+        if (typeof filterCallback !== 'function') {
             def = filterCallback;
             filterCallback = null;
         }
@@ -112,7 +112,7 @@
     };
 
     HALSONResource.prototype.getEmbed = function(rel, filterCallback, def) {
-        if (typeof filterCallback != "function") {
+        if (typeof filterCallback !== 'function') {
             def = filterCallback;
             filterCallback = null;
         }
@@ -120,7 +120,7 @@
     };
 
     HALSONResource.prototype.addLink = function(rel, link) {
-        if (typeof link == "string") {
+        if (typeof link === 'string') {
             link = {href: link};
         }
 
@@ -141,7 +141,15 @@
     };
 
     HALSONResource.prototype.addEmbed = function(rel, embed) {
-        var item = createHALSONResource(embed);
+
+        var item;
+
+        if (!Array.isArray(embed)) {
+            item = createHALSONResource(embed);
+        }
+        else {
+            item = embed.map(createHALSONResource);
+        }
 
         if (!this._embedded) {
             this._embedded = {};
@@ -150,10 +158,10 @@
         if (!(rel in this._embedded)) {
             // first embed
             this._embedded[rel] = item;
-            // multiple embeds
         } else {
+            // later embeds
             this._embedded[rel] = [].concat(this._embedded[rel]);
-            this._embedded[rel].push(item);
+            Array.prototype.push.apply(this._embedded[rel], item);
         }
 
         return this;
@@ -194,7 +202,7 @@
             this._links[rel] = [].concat(this._links[rel]).filter(this._invert(filterCallback));
         }
 
-        this._compact("_links", rel);
+        this._compact('_links', rel);
         return this;
     };
 
@@ -208,7 +216,7 @@
         }
 
         this._embedded[rel] = [].concat(this._embedded[rel]).filter(this._invert(filterCallback));
-        this._compact("_embedded", rel);
+        this._compact('_embedded', rel);
 
         return this;
     };
@@ -227,4 +235,4 @@
     } else if (win) {
         win.halson = createHALSONResource;
     }
-})(typeof(module) == "undefined" ? null : module, typeof(window) == "undefined" ? null : window);
+})(typeof(module) === 'undefined' ? null : module, typeof(window) === 'undefined' ? null : window);
