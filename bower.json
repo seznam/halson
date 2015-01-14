@@ -1,7 +1,7 @@
 {
   "name": "halson",
   "main": "index.js",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "homepage": "https://github.com/seznam/halson",
   "authors": [
     "Juraj Hájovský <juraj@hajovsky.sk>"

@@ -1,5 +1,8 @@
 # Changelog
 
+## Release 2.3.1 (2015-01-14)
+ * Fixed an issue when a single item array is compacted to an object
+
 ## Release 2.3.0 (2015-01-11)
  * Altered addEmbed to accept an array as a second argument
 
