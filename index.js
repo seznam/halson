@@ -17,9 +17,13 @@
             var self = this;
             Object.keys(this._embedded).forEach(function(key) {
                 if (self._embedded.hasOwnProperty(key)) {
+                  if (Array.isArray(self._embedded[key])) {
                     _embedded[key] = [].concat(self._embedded[key]).map(function(embed) {
                         return createHALSONResource(embed);
                     });
+                  } else {
+                    _embedded[key] = createHALSONResource(self._embedded[key]);
+                  }
                 }
             });
 
