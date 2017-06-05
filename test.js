@@ -163,33 +163,6 @@ describe('halson', function() {
         });
     });
 
-    describe('_compact', function() {
-        it('ignore array with many elements', function(){
-            var res = halson(clone(example));
-            var expected = clone(example._embedded);
-            expect(res._embedded.starred).to.be.length(3);
-            res._compact('_embedded');
-            expect(res._embedded.starred).to.be.length(3);
-            assert.deepEqual(res._embedded, expected);
-        });
-
-        it('flatify array with one element', function(){
-            var res = halson(clone(example));
-            var tmp = clone(example._embedded).starred[0];
-            res._embedded.starred = [tmp];
-            expect(res._embedded.starred).to.be.length(1);
-            res._compact('_embedded');
-            assert.deepEqual(res._embedded.starred, tmp);
-        });
-
-        it('purge array with no elements', function(){
-            var res = halson();
-            res._embedded = {};
-            res._compact('_embedded');
-            expect(res._embedded).to.be.an('undefined');
-        });
-    });
-
     describe('listLinkRels()', function() {
         it('return empty list', function() {
             var res = halson().listLinkRels();
@@ -685,7 +658,7 @@ describe('halson', function() {
                 return item.name === 'twitter';
             });
             var expected = clone(example._links);
-            expected.related = expected.related[0];
+            expected.related = [expected.related[0]];
             assert.deepEqual(res._links, expected);
         });
     });

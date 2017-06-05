@@ -17,47 +17,20 @@
             var self = this;
             Object.keys(this._embedded).forEach(function(key) {
                 if (self._embedded.hasOwnProperty(key)) {
+                  if (Array.isArray(self._embedded[key])) {
                     _embedded[key] = [].concat(self._embedded[key]).map(function(embed) {
                         return createHALSONResource(embed);
                     });
+                  } else {
+                    _embedded[key] = createHALSONResource(self._embedded[key]);
+                  }
                 }
             });
 
             this._embedded = _embedded;
         }
 
-        this._compact('_embedded');
-        this._compact('_links');
     }
-
-    HALSONResource.prototype._compact = function(name, key) {
-        var target = this[name];
-
-        if (typeof target !== 'object') {
-            return;
-        }
-
-        var keys = key ? [key] : Object.keys(target);
-
-        keys.forEach(function(k) {
-            var items = target[k];
-            if (!Array.isArray(items)) {
-                return;
-            }
-
-            if (!items.length) {
-                delete(target[k]);
-            } else if (items.length === 1) {
-                target[k] = items[0];
-            }
-        });
-
-        if (!Object.keys(target).length) {
-            return delete this[name];
-        }
-
-        this[name] = target;
-    };
 
     HALSONResource.prototype.className = 'HALSONResource';
 
@@ -165,7 +138,6 @@
             Array.prototype.splice.apply(this._embedded[rel], params);
         }
 
-        this._compact('_embedded', rel);
         return this;
     };
 
@@ -180,7 +152,6 @@
             this._links[rel] = [].concat(this._links[rel]).filter(this._invert(filterCallback));
         }
 
-        this._compact('_links', rel);
         return this;
     };
 
@@ -194,7 +165,6 @@
         }
 
         this._embedded[rel] = [].concat(this._embedded[rel]).filter(this._invert(filterCallback));
-        this._compact('_embedded', rel);
 
         return this;
     };
