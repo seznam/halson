@@ -3,6 +3,9 @@
 
 The [HAL+JSON](http://stateless.co/hal_specification.html) Resource Object.
 
+## Version
+3.0.0
+
 ## Installation
 
 ### node.js
