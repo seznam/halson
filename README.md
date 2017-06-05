@@ -32,14 +32,14 @@ var embed = halson({
     });
 
 var resource = halson({
-        title: "Juraj Hájovský",
-        username: "hajovsky",
+        title: "john doe",
+        username: "doe",
         emails: [
-            "juraj.hajovsky@example.com",
-            "hajovsky@example.com"
+            "john.doe@example.com",
+            "doe@example.com"
         ]
     })
-    .addLink('self', '/hajovsky')
+    .addLink('self', '/doe')
     .addEmbed('starred', embed);
 
 console.log(resource.title);
@@ -85,10 +85,10 @@ List all link relations.
 ```js
 var data = {
     _links: {
-        self: {href: '/hajovsky'},
+        self: {href: '/doe'},
         related: [
-            {href: 'http://hajovsky.sk'},
-            {href: 'https://twitter.com/hajovsky'}
+            {href: 'http://doe.com'},
+            {href: 'https://twitter.com/doe'}
         ]
     }
 }
@@ -168,9 +168,9 @@ Add a link with relation `rel`.
 
 ```js
 resource
-    .addLink('related', 'http://hajovsky.sk')
+    .addLink('related', 'http://doe.com')
     .addLink('related', {
-        href: 'https://twitter.com/hajovsky',
+        href: 'https://twitter.com/doe',
         name: 'twitter'
     });
 ```

@@ -1,10 +1,10 @@
 {
   "name": "halson",
   "main": "index.js",
-  "version": "2.3.1",
+  "version": "3.0.0",
   "homepage": "https://github.com/seznam/halson",
   "authors": [
-    "Juraj Hájovský <juraj@hajovsky.sk>"
+    "Marek Fojtl <jerrymf@gmail.com>"
   ],
   "description": "The HAL+JSON Resource Object",
   "keywords": [
