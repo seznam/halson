@@ -1,7 +1,7 @@
 # Changelog
 
 ## Release 3.0.0 (2017-06-05)
- * [BREAKING CHANGE] Not modifying input data
+ * [BREAKING CHANGE] Not modifying input data (remove internal calling _compact function)
 
 ## Release 2.3.1 (2015-01-14)
  * Fixed an issue when a single item array is compacted to an object
