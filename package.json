@@ -19,6 +19,12 @@
     "name": "Marek Fojtl",
     "email": "jerrymf@gmail.com"
   },
+  "contributors": [
+    {
+      "name": "Martin Jurča",
+      "email": "martin.jurca@firma.seznam.cz"
+    }
+  ],
   "license": "MIT",
   "devDependencies": {
     "mocha": "~1.18.0",
