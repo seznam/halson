@@ -3,6 +3,7 @@
   "version": "3.0.0",
   "description": "The HAL+JSON Resource Object",
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "test": "mocha --reporter spec test.js"
   },
